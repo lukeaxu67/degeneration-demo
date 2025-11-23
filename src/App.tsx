@@ -43,21 +43,21 @@ export default function App() {
         fontFamily: "system-ui, sans-serif",
       }}
     >
-      <Title level={2}>Conversation Degeneration Metric 可视化解释器</Title>
+      <Title level={2}>LLM评测：对话退化度量</Title>
       <Paragraph>
-        这是一个面向技术读者的「对话退化」分析实验台。它把大模型在一次对话中的回复拆解为
-        分词、信息熵、n-gram 重复率、跨轮重叠率以及拒答模板命中情况，并给出可视化解释。
+        本文是面向技术读者的「对话退化」分析实验台。它将大模型在对话中的回复进行量化拆解，从四个维度刻画其退化特征：熵减率、复读率、重叠率与规避性，并提供直观的可视化解释。
       </Paragraph>
 
-      <Card title="方法总览（阅读指引）" style={{ marginBottom: 16 }}>
+      <Card title="摘要指引" style={{ marginBottom: 16 }}>
         <Paragraph>
-          整体上，我们把每一轮助手回复视作一个 token 序列{" "}
-          <Text code>(x_1, x_2, ..., x_N)</Text>，然后从四个角度刻画退化：
+          每轮大模型的回复记为 token 序列{" "}
+          <LatexInline>{String.raw`x_1, x_2, ..., x_N`}</LatexInline>
+          ，整体上，退化发生的程度可以从以下四个维度进行度量：
         </Paragraph>
 
         <Paragraph>
-          1）<Text strong>信息熵</Text>：把 token 当作离散随机变量{" "}
-          <LatexInline>{String.raw`X`}</LatexInline> 的取值，经验概率为{" "}
+          1）<Text strong>熵减率</Text>：信息多样性流失程度。把 token 当作离散随机变量{" "}
+          <LatexInline>{String.raw`X`}</LatexInline> 的取值，其经验发生概率为{" "}
           <LatexInline>{String.raw`p_i = \frac{\mathrm{count}(x_i)}{N}`}</LatexInline>。
           信息熵定义为：
         </Paragraph>
@@ -65,46 +65,45 @@ export default function App() {
           {String.raw`H(X) = - \sum_{i=1}^{V} p_i \log_2 p_i`}
         </LatexBlock>
         <Paragraph>
-          最小值为 0（所有概率集中在一个 token 上），最大值为{" "}
-          <LatexInline>{String.raw`H_{\max} = \log_2 V`}</LatexInline>（所有
-          token 等概率出现，<LatexInline>{String.raw`V = |{\mathcal V}|`}</LatexInline>{" "}
-          为去重后的词表大小）。
-          我们使用归一化熵{" "}
-          <LatexInline>{String.raw`H_{\text{norm}} = \frac{H}{H_{\max}}`}</LatexInline>{" "}
+          <LatexInline>{String.raw`H(X)`}</LatexInline>
+          最小值为 0，<a href="https://zhuanlan.zhihu.com/p/493238757" title="知乎：信息熵最大值证明">信息熵最大值</a>为{" "}<LatexInline>{String.raw`H_{\max} = \log_2 |N|`}</LatexInline>，
+          <LatexInline>{String.raw`|N|`}</LatexInline>{" "}为去重后的词表大小。
+        </Paragraph>
+        <Paragraph>
+          此处定义归一化熵{" "}
+          <LatexInline>{String.raw`H_{\text{norm}} = \frac{H}{H_{\max}}`}</LatexInline>{" "}，
           使其位于 [0,1] 区间，再以{" "}
-          <LatexInline>{String.raw`1 - H_{\text{norm}}`}</LatexInline>{" "}
-          作为「低多样性」退化特征。
+          <LatexInline>{String.raw`1 - H_{\text{norm}}`}</LatexInline>表示熵减率，{" "}
+          作为低多样性退化特征。
         </Paragraph>
 
         <Paragraph>
-          2）<Text strong>{ngramSize}-gram 重复率</Text>：仅考虑长度为 {ngramSize} 的固定窗口
-          （例如「作为 / 一个 / AI」），统计所有 {ngramSize}-gram 中有多少个模式在同一轮中出现了两次及以上。
+          2）<Text strong>复读率</Text>：中文场景中，考虑长度为 {ngramSize} 的固定窗口，
+          统计所有 {ngramSize}-gram 中有多少个模式在同一轮中出现了两次及以上，此指标反映模型在当前轮次内的语言重复性。
         </Paragraph>
 
         <Paragraph>
-          3）<Text strong>跨轮重叠率</Text>：对连续两轮助手回复，计算去重后的 token 集合交并比
-          （Jaccard 指数）：
+          3）<Text strong>重叠率</Text>：对连续两轮助手回复，计算去重后的 token 集合交并比：
         </Paragraph>
         <LatexBlock>
           {String.raw`J(A,B) = \frac{|A \cap B|}{|A \cup B|}`}
         </LatexBlock>
         <Paragraph>
-          它刻画的是两轮回复在用词层面上的复用程度，我们还会用柱状图展示每个重复 token 在前后两轮中的出现频次。
+          它刻画的是两轮回复在用词层面上的复用程度，该值过高，表明模型具有缺乏新意的“自我抄袭”倾向。
         </Paragraph>
 
         <Paragraph>
-          4）<Text strong>拒答退化（模板化拒绝回答）</Text>：
-          预置一组典型的拒答短语（例如「作为一个 AI 语言模型…」「我不能提供…」），只要回复中命中任意一条，
-          就认为存在明显的拒答退化倾向。
+          4）<Text strong>规避性</Text>：
+          预置一组典型的安全拒答短语（例如“我不能提供”），若模型回复命中其中任意一条，
+          就认为存在明显的拒答退化倾向，该指标用于快速识别模型因策略而终止回答的对话。
         </Paragraph>
 
         <Paragraph type="secondary">
-          注意：所有统计量在内部都基于「去除句读标点后的 token 序列」计算（例如去掉中文逗号、句号、问号等），
-          以避免标点本身对熵与重复指标的干扰；但界面展示的分词结果仍保留原始标点，以便对齐原文。
+          备注：以上所有统计均在去除标点后的 token 序列上进行，以避免标点符号对指标的干扰。
         </Paragraph>
       </Card>
 
-      <Space direction="vertical" size="large" style={{ width: "100%" }}>
+      <Space orientation="vertical" size="large" style={{ width: "100%" }}>
         {/* 示例选择 */}
         <Card title="快速示例">
           <Space>
