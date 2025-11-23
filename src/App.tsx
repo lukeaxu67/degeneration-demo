@@ -4,7 +4,6 @@ import { Tabs, Card, Space, Typography, Divider, Tag, Alert } from "antd";
 import TokenHighlighter from "./components/TokenHighlighter";
 import EntropyChart from "./components/EntropyChart";
 import NgramChart from "./components/NgramChart";
-import ScoreGauge from "./components/ScoreGauge";
 import { calculateDegenerationMetric } from "./utils/metrics";
 import { SAMPLE_CONVERSATIONS } from "./utils/sampleData";
 
@@ -48,7 +47,7 @@ export default function App() {
 
       <Space orientation="vertical" size="large" style={{ width: "100%" }}>
         {/* 示例选择 */}
-        <Card title="快速体验示例">
+        <Card title="快速示例">
           <Space>
             <Tag
               color={turns === SAMPLE_CONVERSATIONS[0].turns ? "green" : "default"}
@@ -68,10 +67,10 @@ export default function App() {
         </Card>
 
         {/* 手动编辑对话（可选） */}
-        <Card title="对话记录（可编辑）">
+        <Card title="对话记录">
           {turns.map((turn, i) => (
             <div key={i} style={{ marginBottom: 12 }}>
-              <strong>{turn.role === "user" ? "用户" : "助手"}:</strong>{" "}
+              <strong>{turn.role === "user" ? "User" : "Assistant"}:</strong>{" "}
               <input
                 style={{ width: "100%", padding: "4px 8px", fontSize: 15 }}
                 value={turn.content}
@@ -89,15 +88,6 @@ export default function App() {
           <Alert type="error" message={result.error} />
         ) : (
           <>
-            {/* 核心评分 */}
-            <Card>
-              <Space size="large" wrap>
-                fdjsklqk 
-                <ScoreGauge score={result.peak_score} title="Peak Degeneration" />
-                <ScoreGauge score={result.average_score} title="Average Score" />
-              </Space>
-            </Card>
-
             {/* 逐轮详细分析 */}
             <Tabs
               defaultActiveKey="0"
@@ -110,7 +100,7 @@ export default function App() {
                       <Paragraph style={{ fontSize: 16 }}>{turn.content}</Paragraph>
                     </Card>
 
-                    <Card title="分词结果（jieba）">
+                    <Card title="分词结果">
                       <TokenHighlighter text={turn.content} tokens={turn.tokens} />
                     </Card>
 
