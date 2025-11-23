@@ -310,6 +310,9 @@ export default function App() {
           </>
         )}
       </Space>
+      <Paragraph type="secondary" style={{marginTop: 16}}>
+        本页面基于 React + Typescript + Vite 构建， 本文内容是对 <a href="https://github.com/comet-ml/opik/blob/1.9.26/sdks/python/src/opik/evaluation/metrics/conversation/heuristics/degeneration/metric.py">comet-ml/opik</a> 中 <Text code>ConversationDegenerationMetric</Text> 的解读。
+      </Paragraph>
       <ClarityProvider projectId="ualakd1qip" />
     </div>
   );
