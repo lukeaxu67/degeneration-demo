@@ -20,8 +20,10 @@ export default function App() {
   const [ngramSize] = useState(3);
 
   useEffect(() => {
-    // 启动时初始化 wasm 版 jieba
-    initJieba();
+    // 初始化 jieba，完成后强制刷新一次，让分词结果基于 jieba 重新计算
+    initJieba().then(() => {
+      setTurns((prev) => [...prev]);
+    });
   }, []);
 
   const result = useMemo(() => {
@@ -32,14 +34,19 @@ export default function App() {
     }
   }, [turns, ngramSize]);
 
-  // const assistantTurns = turns.filter((t) => t.role === "assistant");
-
   return (
-    <div style={{ padding: "24px", maxWidth: "1400px", margin: "0 auto", fontFamily: "system-ui, sans-serif" }}>
+    <div
+      style={{
+        padding: "24px",
+        maxWidth: "1400px",
+        margin: "0 auto",
+        fontFamily: "system-ui, sans-serif",
+      }}
+    >
       <Title level={2}>Conversation Degeneration Metric 可视化解释器</Title>
       <Paragraph>实时展示 LLM 对话退化（degeneration）指标的完整计算过程</Paragraph>
 
-      <Space direction="vertical" size="large" style={{ width: "100%" }}>
+      <Space orientation="vertical" size="large" style={{ width: "100%" }}>
         {/* 示例选择 */}
         <Card title="快速体验示例">
           <Space>
@@ -91,10 +98,13 @@ export default function App() {
             </Card>
 
             {/* 逐轮详细分析 */}
-            <Tabs defaultActiveKey="0">
-              {result.per_turn.map((turn, idx) => (
-                <Tabs.TabPane tab={`第 ${idx + 1} 轮助手回复`} key={idx}>
-                  <Space direction="vertical" size="middle" style={{ width: "100%" }}>
+            <Tabs
+              defaultActiveKey="0"
+              items={result.per_turn.map((turn, idx) => ({
+                key: String(idx),
+                label: `第${idx + 1} 轮助手回复`,
+                children: (
+                  <Space orientation="vertical" size="middle" style={{ width: "100%" }}>
                     <Card title="原始回复">
                       <Paragraph style={{ fontSize: 16 }}>{turn.content}</Paragraph>
                     </Card>
@@ -103,7 +113,7 @@ export default function App() {
                       <TokenHighlighter text={turn.content} tokens={turn.tokens} />
                     </Card>
 
-                    <Card title="信息熵分布">
+                    <Card title="信息熵分析">
                       <EntropyChart tokens={turn.tokens} />
                     </Card>
 
@@ -113,21 +123,24 @@ export default function App() {
 
                     <Card title="四项子指标">
                       <Space size="large">
-                        <div>重复率: {(turn.repetition_ratio * 100).toFixed(1)}%</div>
-                        <div>与上轮重叠: {(turn.overlap_previous * 100).toFixed(1)}%</div>
-                        <div>拒绝词命中: {turn.fallback_hit ? "是" : "否"}</div>
-                        <div>低多样性: {(turn.normalized_entropy * 100).toFixed(1)}%</div>
+                        <div>重复度 {(turn.repetition_ratio * 100).toFixed(1)}%</div>
+                        <div>与上轮重合 {(turn.overlap_previous * 100).toFixed(1)}%</div>
+                        <div>拒绝词命中 {turn.fallback_hit ? "是" : "否"}</div>
+                        <div>低多样性 {(turn.normalized_entropy * 100).toFixed(1)}%</div>
                       </Space>
                       <Divider />
-                      <Title level={4}>本轮 Degeneration Score: {(turn.degeneration_score).toFixed(3)}</Title>
+                      <Title level={4}>
+                        本轮 Degeneration Score: {turn.degeneration_score.toFixed(3)}
+                      </Title>
                     </Card>
                   </Space>
-                </Tabs.TabPane>
-              ))}
-            </Tabs>
+                ),
+              }))}
+            />
           </>
         )}
       </Space>
     </div>
   );
 }
+
