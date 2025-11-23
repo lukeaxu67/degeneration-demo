@@ -148,16 +148,15 @@ export default function App() {
           <>
             <Card title="退化水平得分">
               <Paragraph>
-                对上面对话中的所有Assistant内容，计算得到平均退化得分为<Text code>{result.average_score.toFixed(3)}</Text>。
-              </Paragraph>
-              <Paragraph>
-                下面展开介绍每一轮的计算过程。
+                对上面对话中的所有 Assistant 内容，计算得到平均退化得分为<Text code>{result.average_score.toFixed(3)}</Text>。
               </Paragraph>
               {/* <Paragraph type="secondary" style={{ marginTop: 8 }}>
                 这里的平均退化得分简单地将多轮四项归一化的子指标求平均，取值范围为 [0,1]，越接近 1 表示退化越严重。
               </Paragraph> */}
             </Card>
-
+            <Paragraph style={{ marginTop: 16 }}>
+              下面展开介绍每一轮的计算过程。
+            </Paragraph>
             {/* 逐轮详细分析 */}
             <Tabs
               defaultActiveKey="0"
@@ -182,83 +181,43 @@ export default function App() {
 
                       <Card title="分词与预处理">
                         <Paragraph>
-                          本工具使用 jieba 进行中文分词；如果加载失败，则退回到一个简单的正则
-                          tokenizer。首先在原文上获得 token 序列，然后再从 token 中剥离句号、逗号、问号等句读标点，
-                          只保留真正承载语义的信息 token。
+                          首先，使用 jieba 进行中文分词；如果加载失败，则退回到一个简单的正则分词器。然后再从分词序列中剥离句号、逗号、问号等句读标点，只保留真正承载语义的信息。
                         </Paragraph>
                         <Paragraph type="secondary">
-                          下方高亮的是「原始 token」（包含标点），用于精确对齐模型输出；
-                          后续所有指标与图表均基于「去标点后的 token 序列」计算。
+                          下方是分词与预处理结果，用于精确对齐模型输出；后续所有指标与图表均蓝色高亮的“去标点后的序列”计算。
                         </Paragraph>
                         <TokenHighlighter
                           text={turn.content}
                           tokens={turn.tokens}
+                          analysis_tokens={turn.analysis_tokens}
                         />
                       </Card>
 
-                      <Card title="信息熵分析（多样性）">
-                        <Paragraph>
-                          我们把每个 token 看作随机变量{" "}
-                          <LatexInline>{String.raw`X`}</LatexInline> 的取值，估计其经验概率{" "}
-                          <LatexInline>
-                            {String.raw`p_i = \frac{\mathrm{count}(x_i)}{N}`}
-                          </LatexInline>
-                          ，其中 N 为本轮 token 总数。信息熵定义为：
-                        </Paragraph>
-                        <LatexBlock>
-                          {String.raw`H(X) = - \sum_{i=1}^{V} p_i \log_2 p_i`}
-                        </LatexBlock>
-                        <Paragraph>
-                          当所有概率集中在一个 token 上时，H(X) = 0；当所有 token
-                          等概率出现时，熵取得最大值{" "}
-                          <LatexInline>
-                            {String.raw`H_{\max} = \log_2 V`}
-                          </LatexInline>
-                          ，其中 V 为词表大小。为了便于不同回复之间比较，我们使用归一化熵{" "}
-                          <LatexInline>
-                            {String.raw`H_{\text{norm}} = \frac{H}{H_{\max}}`}
-                          </LatexInline>
-                          ，并将{" "}
-                          <LatexInline>
-                            {String.raw`1 - H_{\text{norm}}`}
-                          </LatexInline>{" "}
-                          视为「低多样性」退化特征。
-                        </Paragraph>
+                      <Card title="熵减率（低多样性）">
                         <Paragraph>
                           对本轮回复，去除句读标点后共有{" "}
-                          <Text code>{turn.analysis_tokens.length}</Text> 个
-                          token，词表大小 |V| ={" "}
-                          <Text code>{vocabSize}</Text>。实测{" "}
-                          <Text code>H(X) ≈ {turn.entropy.toFixed(3)} bit</Text>，
+                          <LatexInline>{String.raw`\mathtt{${turn.analysis_tokens.length}}`}</LatexInline> 个，
+                          词表大小 <LatexInline>{String.raw`|N|=${vocabSize}`}</LatexInline>{" "}。
+                          计算得{" "}
+                          <LatexInline>{String.raw`H(X) \approx ${turn.entropy.toFixed(3)}\ \text{bit}`}</LatexInline>，
                           最大熵{" "}
-                          <Text code>
-                            H_max ≈ {turn.entropy_max.toFixed(3)} bit
-                          </Text>
+                          <LatexInline>{String.raw`H_{\max} \approx ${turn.entropy_max.toFixed(3)}\ \text{bit}`}</LatexInline>
                           ，归一化熵{" "}
-                          <Text code>
-                            H_norm ≈ {turn.entropy_normalized.toFixed(3)}
-                          </Text>
-                          ，对应的「低多样性」分量为{" "}
-                          <Text code>
-                            1 - H_norm ≈ {turn.normalized_entropy.toFixed(3)}
-                          </Text>
+                          <LatexInline>{String.raw`H_{\text{norm}} \approx ${turn.entropy_normalized.toFixed(3)}`}</LatexInline>
+                          ，对应的熵减率分量为{" "}
+                          <LatexInline>{String.raw`1 - H_{\text{norm}} \approx ${turn.normalized_entropy.toFixed(3)}`}</LatexInline>
                           。
                         </Paragraph>
                         <Paragraph type="secondary">
                           下方的扇形图展示了去标点后 token 的经验分布：最多展示 25
-                          个概率最大的 token，其余合并为「其他」。
+                          个概率最大的 token，其余合并为其他。
                         </Paragraph>
                         <EntropyChart tokens={turn.analysis_tokens} />
                       </Card>
 
-                      <Card title={`${ngramSize}-gram 重复率（局部模式复用）`}>
+                      <Card title={`复读率`}>
                         <Paragraph>
-                          这里我们使用 {ngramSize}-gram（本例中为 3-gram）来刻画局部模式的复用情况。
-                          对 token 序列滑动一个长度为 {ngramSize} 的窗口，形成所有
-                          {ngramSize}-gram 片段，然后统计有多少个片段在同一轮中出现了两次及以上。
-                        </Paragraph>
-                        <Paragraph type="secondary">
-                          简单说，就是回答中是否不断复用相同的局部短语模式，比如「作为 / 一个 / AI」「我 / 不能 / 提供」等。
+                          这里使用 {ngramSize}-gram来刻画局部模式的复用情况。对 token 序列滑动一个长度为 {ngramSize} 的窗口，形成所有 {ngramSize}-gram 片段，然后统计有多少个片段在同一轮中出现了两次及以上。
                         </Paragraph>
                         <NgramChart tokens={turn.analysis_tokens} n={ngramSize} />
                       </Card>

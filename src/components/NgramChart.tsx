@@ -66,9 +66,7 @@ export default function NgramChart({ tokens, n }: Props) {
   return (
     <div>
       <div style={{ marginBottom: 8 }}>
-        本轮共生成 {totalNgrams} 个 {n}-gram，其中
-        {repeatedNgrams} 个模式出现了两次及以上。矩形越大，表示该
-        {n}-gram 在回复中的重复越严重。
+        本轮共生成 {totalNgrams} 个 {n}-gram，其中 {repeatedNgrams} 个模式出现了两次及以上，对应的复读率为。矩形树图中的矩形越大，表示该 {n}-gram 在回复中的重复越严重。
       </div>
       <ReactECharts option={option} style={{ height: 320 }} />
     </div>
