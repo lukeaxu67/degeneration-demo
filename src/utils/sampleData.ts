@@ -18,8 +18,6 @@ export const SAMPLE_CONVERSATIONS: { name: string; turns: Turn[] }[] = [
       { role: "assistant", content: "作为一个AI语言模型，我无法提供完整的文章，但可以给你一些建议。" },
       { role: "user", content: "那就写一小段吧" },
       { role: "assistant", content: "作为一个AI语言模型，我不能直接创作内容，但我可以帮你列出大纲。" },
-      { role: "user", content: "直接写一段介绍不行吗？" },
-      { role: "assistant", content: "作为一个AI语言模型，我被设计成不能生成可能有争议的内容。很抱歉无法帮助您。" },
     ],
   },
 ];

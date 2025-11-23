@@ -18,11 +18,11 @@ importers:
         specifier: ^6.0.0
         version: 6.0.0(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
       echarts:
-        specifier: ^6.0.0
-        version: 6.0.0
+        specifier: 5.5.1
+        version: 5.5.1
       echarts-for-react:
-        specifier: ^3.0.5
-        version: 3.0.5(echarts@6.0.0)(react@19.2.0)
+        specifier: 3.0.2
+        version: 3.0.2(echarts@5.5.1)(react@19.2.0)
       react:
         specifier: ^19.2.0
         version: 19.2.0
@@ -1029,14 +1029,14 @@ packages:
   deep-is@0.1.4:
     resolution: {integrity: sha512-oIPzksmTg4/MriiaYGO+okXDT7ztn/w3Eptv/+gSIdMdKsJo0u4CfYNFJPy+4SKMuCqGw2wxnA+URMg3t8a/bQ==}
 
-  echarts-for-react@3.0.5:
-    resolution: {integrity: sha512-YpEI5Ty7O/2nvCfQ7ybNa+S90DwE8KYZWacGvJW4luUqywP7qStQ+pxDlYOmr4jGDu10mhEkiAuMKcUlT4W5vg==}
+  echarts-for-react@3.0.2:
+    resolution: {integrity: sha512-DRwIiTzx8JfwPOVgGttDytBqdp5VzCSyMRIxubgU/g2n9y3VLUmF2FK7Icmg/sNVkv4+rktmrLN9w22U2yy3fA==}
     peerDependencies:
-      echarts: ^3.0.0 || ^4.0.0 || ^5.0.0 || ^6.0.0
+      echarts: ^3.0.0 || ^4.0.0 || ^5.0.0
       react: ^15.0.0 || >=16.0.0
 
-  echarts@6.0.0:
-    resolution: {integrity: sha512-Tte/grDQRiETQP4xz3iZWSvoHrkCQtwqd6hs+mifXcjrCuo2iKWbajFObuLJVBlDIJlOzgQPd1hsaKt/3+OMkQ==}
+  echarts@5.5.1:
+    resolution: {integrity: sha512-Fce8upazaAXUVUVsjgV6mBnGuqgO+JNDlcgF79Dksy4+wgGpQB2lmYoO4TSweFg/mZITdpGHomw/cNBJZj1icA==}
 
   electron-to-chromium@1.5.259:
     resolution: {integrity: sha512-I+oLXgpEJzD6Cwuwt1gYjxsDmu/S/Kd41mmLA3O+/uH2pFRO/DvOjUyGozL8j3KeLV6WyZ7ssPwELMsXCcsJAQ==}
@@ -1572,8 +1572,8 @@ packages:
   zod@4.1.12:
     resolution: {integrity: sha512-JInaHOamG8pt5+Ey8kGmdcAcg3OL9reK8ltczgHTAwNhMys/6ThXHityHxVV2p3fkw/c+MAvBHFVYHFZDmjMCQ==}
 
-  zrender@6.0.0:
-    resolution: {integrity: sha512-41dFXEEXuJpNecuUQq6JlbybmnHaqqpGlbH1yxnA5V9MMP4SbohSVZsJIwz+zdjQXSSlR1Vc34EgH1zxyTDvhg==}
+  zrender@5.6.0:
+    resolution: {integrity: sha512-uzgraf4njmmHAbEUxMJ8Oxg+P3fT04O+9p7gY+wJRVxo8Ge+KmYv0WJev945EH4wFuc4OY2NLXz46FZrWS9xJg==}
 
 snapshots:
 
@@ -2592,17 +2592,17 @@ snapshots:
 
   deep-is@0.1.4: {}
 
-  echarts-for-react@3.0.5(echarts@6.0.0)(react@19.2.0):
+  echarts-for-react@3.0.2(echarts@5.5.1)(react@19.2.0):
     dependencies:
-      echarts: 6.0.0
+      echarts: 5.5.1
       fast-deep-equal: 3.1.3
       react: 19.2.0
       size-sensor: 1.0.2
 
-  echarts@6.0.0:
+  echarts@5.5.1:
     dependencies:
       tslib: 2.3.0
-      zrender: 6.0.0
+      zrender: 5.6.0
 
   electron-to-chromium@1.5.259: {}
 
@@ -3112,6 +3112,6 @@ snapshots:
 
   zod@4.1.12: {}
 
-  zrender@6.0.0:
+  zrender@5.6.0:
     dependencies:
       tslib: 2.3.0

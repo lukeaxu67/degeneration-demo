@@ -92,6 +92,7 @@ export default function App() {
             {/* 核心评分 */}
             <Card>
               <Space size="large" wrap>
+                fdjsklqk 
                 <ScoreGauge score={result.peak_score} title="Peak Degeneration" />
                 <ScoreGauge score={result.average_score} title="Average Score" />
               </Space>

@@ -1,5 +1,6 @@
 // src/components/ScoreGauge.tsx
 import ReactECharts from "echarts-for-react";
+import type {} from "echarts";   // 关键就这一行！！！
 
 interface Props {
   score: number;
